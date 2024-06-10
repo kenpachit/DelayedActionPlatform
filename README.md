@@ -1,1 +1,1 @@
-# DelayedActionPlatform
+The DelayedActionPlatform project is designed to seamlessly schedule and manage delayed actions through a user-friendly interface. Leveraging JavaScript for frontend logic, this repository integrates smart contract interactions, backend API communication, and comprehensive user input functionalities. Users can effortlessly input action details, schedule these actions according to their preferences, and view their scheduled activities. Our platform ensures a smooth and intuitive experience for managing time-sensitive tasks on the blockchain.

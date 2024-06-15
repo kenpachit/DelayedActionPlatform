@@ -1,6 +1,6 @@
 import Web3 from 'web3';
 import axios from 'axios';
-import { abi } from './DelayedActionPlatformContractABI'; 
+import { abi } from './DelayedActionPlatformContractABI';
 
 const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS;
 const API_BASE_URL = process.env.API_BASE_URL;
@@ -15,15 +15,18 @@ let lastFetchTime = null;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 const submitAction = async (fromAddress, privateKey, actionDetails, scheduleTime) => {
-    const transaction = delayedActionContract.methods.scheduleAction(actionDetails, scheduleTime.getTime());
-    const signedTx = await web3.eth.accounts.signTransaction({
-        to: CONTRACT_ADDRESS,
-        data: transaction.encodeABI(),
-        gas: '1000000',
-    }, privateKey);
-    const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);    
-    console.log(`Transaction hash: ${receipt.transactionHash}`);
-    
+    try {
+        const transaction = delayedActionContract.methods.scheduleAction(actionDetails, scheduleTime.getTime());
+        const signedTx = await web3.eth.accounts.signTransaction({
+            to: CONTRACT_ADDRESS,
+            data: transaction.encodeABI(),
+            gas: '1000000',
+        }, privateKey);
+        const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+        console.log(`Transaction hash: ${receipt.transactionHash}`);
+    } catch (error) {
+        console.error('An error occurred while submitting the action:', error);
+    }
     cachedScheduledActions = null;
 };
 
@@ -49,15 +52,19 @@ const fetchScheduledActions = async () => {
 
 const scheduleActionFormSubmit = async (event) => {
     event.preventDefault();
-    const form = document.getElementById('actionForm');
-    const fromAddress = form.elements['fromAddress'].value;
-    const privateKey = form.elements['privateKey'].value;
-    const actionDetails = form.elements['actionDetails'].value;
-    const scheduleTime = new Date(form.elements['schedule toTime'].value); // Corrected 'scheduleOptionTime' to 'scheduleTime'
-    
-    await submitAction(fromAddress, privateKey, actionDetails, scheduleTime);
+    try {
+        const form = document.getElementById('actionForm');
+        const fromAddress = form.elements['fromAddress'].value;
+        const privateKey = form.elements['privateKey'].value;
+        const actionDetails = form.elements['actionDetails'].value;
+        const scheduleTime = new Date(form.elements['scheduleTime'].value); // Ensure the element's name matches exactly
+
+        await submitAction(fromAddress, privateKey, actionDetails, scheduleCoordinatesTime);
+    } catch (error) {
+        console.error('Error handling form submission:', error);
+    }
 };
 
 document.getElementById('actionForm').addEventListener('submit', scheduleActionFormSubmit);
 
-fetchScheduledInfoscheduledActions();
+fetchScheduledActions();

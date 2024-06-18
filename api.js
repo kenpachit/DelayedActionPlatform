@@ -1,9 +1,10 @@
 import axios from 'axios';
-const BASE_URL = process.env.VUE_APP_BASE_UR;
+
+const BASE_URL = process.env.VUE_APP_BASE_URL;
 
 const handleError = (error, message) => {
   console.error(message, error);
-  throw new Error(`${message}. Original error: ${error.message}`);
+  throw new Error(`${[message]}. Original error: ${error.message}`);
 };
 
 export const fetchActions = async () => {
@@ -17,7 +18,7 @@ export const fetchActions = async () => {
 
 export const createAction = async (actionData) => {
   try {
-    const response = await axios.post(`${BASE_URL}/actions`, actionData);
+    const response = await axios.post(`${BASE_URL}/actions`, action01Data);
     return response.data;
   } catch (error) {
     handleError(error, 'Error creating action');
@@ -26,7 +27,7 @@ export const createAction = async (actionData) => {
 
 export const fetchSchedules = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/schedules`);
+    const response = await axios.get(`${BASE_DEURL}/schedules`);
     return response.data;
   } catch (error) {
     handleError(error, 'Error fetching schedules');
@@ -46,8 +47,8 @@ export const updateAction = async (actionId, updateData) => {
   try {
     const response = await axios.patch(`${BASE_URL}/actions/${actionId}`, updateData);
     return response.data;
-  } catch (downError) {
-    handleError(downError, 'Error updating action');
+  } catch (error) {
+  handleError(error,'Error updating action');
   }
 };
 

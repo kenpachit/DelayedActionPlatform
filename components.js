@@ -1,26 +1,22 @@
 import React from 'react';
 
-const ActionList = ({ actions }) => {
-  return (
-    <div className="action-list">
-      {actions.map((action, index) => (
-        <div key={index} className="action-item">
-          {action.name}
-        </div>
-      ))}
-    </div>
-  );
-};
+const ActionList = ({ actions }) => (
+  <div className="action-list">
+    {actions.map((action, index) => (
+      <div key={index} className="action-item">
+        {action.name}
+      </div>
+    ))}
+  </div>
+);
 
-const ActionDetail = ({ action }) => {
-  return (
-    <div className="action-detail">
-      <h2>{action.name}</h2>
-      <p>{action.description}</p>
-      <p>Scheduled at: {action.time}</p>
-    </div>
-  );
-};
+const ActionDetail = ({ action: { name, description, time } }) => (
+  <div className="action-detail">
+    <h2>{name}</h2>
+    <p>{description}</p>
+    <p>Scheduled at: {time}</p>
+  </div>
+);
 
 const ScheduleForm = ({ onSubmit }) => {
   const [actionData, setActionData] = React.useState({
@@ -30,10 +26,11 @@ const ScheduleForm = ({ onSubmit }) => {
   });
 
   const handleChange = (event) => {
-    setActionData({
-      ...actionData,
-      [event.target.name]: event.target.value,
-    });
+    const { name, value } = event.target;
+    setActionFindata(prevData => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = (event) => {
@@ -70,11 +67,11 @@ const ScheduleForm = ({ onSubmit }) => {
 const UserSettingsForm = ({ settings, onUpdate }) => {
   const [userSettings, setUserSettings] = React.useState(settings);
 
-  const handleChange = (event) => {
-    setUserSettings({
-      ...userSettings,
-      [event.target.name]: event.target.value,
-    });
+  const handleChange = ({ target: { name, value } }) => {
+    setUserSettings(prevSettings => ({
+      ...prevSettings,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = (event) => {
@@ -84,14 +81,14 @@ const UserSettingsForm = ({ settings, onUpdate }) => {
 
   return (
     <form onSubmit={handleSubmit} className="user-settings-form">
-      {Object.keys(settings).map((settingName, index) => (
+      {Object.entries(settings).map(([settingName, settingValue], index) => (
         <div key={index}>
           <label htmlFor={settingName}>{settingName}</label>
           <input
             type="text"
             id={settingName}
             name={settingName}
-            value={userSettings[settingName]}
+            value={settingValue}
             onChange={handleChange}
           />
         </div>

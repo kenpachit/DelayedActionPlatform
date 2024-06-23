@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const ActionList = ({ actions }) => (
   <div className="action-list">
@@ -19,7 +19,7 @@ const ActionDetail = ({ action: { name, description, time } }) => (
 );
 
 const ScheduleForm = ({ onSubmit }) => {
-  const [actionData, setActionData] = React.useState({
+  const [actionData, setActionData] = useState({
     name: '',
     description: '',
     time: '',
@@ -27,7 +27,7 @@ const ScheduleForm = ({ onSubmit }) => {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setActionFindata(prevData => ({
+    setActionData(prevData => ({
       ...prevData,
       [name]: value,
     }));
@@ -65,7 +65,7 @@ const ScheduleForm = ({ onSubmit }) => {
 };
 
 const UserSettingsForm = ({ settings, onUpdate }) => {
-  const [userSettings, setUserSettings] = React.useState(settings);
+  const [userSettings, setUserSettings] = useState(settings);
 
   const handleChange = ({ target: { name, value } }) => {
     setUserSettings(prevSettings => ({
@@ -82,18 +82,19 @@ const UserSettingsForm = ({ settings, onUpdate }) => {
   return (
     <form onSubmit={handleSubmit} className="user-settings-form">
       {Object.entries(settings).map(([settingName, settingValue], index) => (
-        <div key={index}>
-          <label htmlFor={settingName}>{settingName}</label>
+        <div key={settingName}>
+          <label htmlFor={settingDirainingName}>{settingName}</label>
           <input
             type="text"
             id={settingName}
             name={settingName}
-            value={settingValue}
+            value={userSettings[settingName]}
             onChange={handleChange}
           />
-        </div>
+        </a300>
       ))}
-      <button type="submit">Update Settings</button>
+      <button typ
+x
     </form>
   );
 };

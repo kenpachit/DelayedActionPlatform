@@ -10,93 +10,92 @@ const ActionList = ({ actions }) => (
   </div>
 );
 
-const ActionDetail = ({ action: { name, description, time } }) => (
+const ActionDetails = ({ action: { name, description, scheduledTime } }) => (
   <div className="action-detail">
     <h2>{name}</h2>
     <p>{description}</p>
-    <p>Scheduled at: {time}</p>
+    <p>Scheduled at: {scheduledTime}</p>
   </div>
 );
 
-const ScheduleForm = ({ onSubmit }) => {
-  const [actionData, setActionData] = useState({
+const ScheduleActionForm = ({ onActionSubmit }) => {
+  const [scheduledAction, setScheduledAction] = useState({
     name: '',
     description: '',
     time: '',
   });
 
-  const handleChange = (event) => {
+  const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setActionData(prevData => ({
-      ...prevData,
+    setScheduledAction(prevAction => ({
+      ...prevAction,
       [name]: value,
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleFormSubmit = (event) => {
     event.preventDefault();
-    onSubmit(actionData);
+    onActionSubmit(scheduledAction);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="schedule-form">
+    <form onSubmit={handleFormSubmit} className="schedule-form">
       <input
         type="text"
         name="name"
         placeholder="Action Name"
-        value={actionData.name}
-        onChange={handleChange}
+        value={scheduledAction.name}
+        onChange={handleInputChange}
       />
       <textarea
         name="description"
         placeholder="Action Description"
-        value={actionData.description}
-        onChange={handleChange}
+        value={scheduledAction.description}
+        onChange={handleInputChange}
       />
       <input
         type="datetime-local"
         name="time"
-        value={actionData.time}
-        onChange={handleChange}
+        value={scheduledAction.time}
+        onChange={handleInputChange}
       />
       <button type="submit">Schedule Action</button>
     </form>
   );
 };
 
-const UserSettingsForm = ({ settings, onUpdate }) => {
-  const [userSettings, setUserSettings] = useState(settings);
+const UserSettingsForm = ({ initialSettings, onUpdateSettings }) => {
+  const [userSettings, setUserSettings] = useState(initialSettings);
 
-  const handleChange = ({ target: { name, value } }) => {
+  const handleSettingsChange = ({ target: { name, value } }) => {
     setUserSettings(prevSettings => ({
       ...prevSettings,
       [name]: value,
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSettingsSubmit = (event) => {
     event.preventDefault();
-    onUpdate(userSettings);
+    onUpdateSettings(userSettings);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="user-settings-form">
-      {Object.entries(settings).map(([settingName, settingValue], index) => (
+    <form onSubmit={handleSettingsSubmit} className="user-settings-form">
+      {Object.entries(initialSettings).map(([settingName, settingValue]) => (
         <div key={settingName}>
-          <label htmlFor={settingDirainingName}>{settingName}</label>
+          <label htmlFor={settingName}>{settingName}</label>
           <input
             type="text"
             id={settingName}
             name={settingName}
             value={userSettings[settingName]}
-            onChange={handleChange}
+            onChange={handleSettingsChange}
           />
-        </a300>
+        </div>
       ))}
-      <button typ
-x
+      <button type="submit">Update Settings</button>
     </form>
   );
 };
 
-export { ActionList, ActionDetail, ScheduleForm, UserSettingsForm };
+export { ActionList, ActionDetails, ScheduleActionForm, UserSettingsForm };

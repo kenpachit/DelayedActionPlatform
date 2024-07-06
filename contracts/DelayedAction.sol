@@ -14,13 +14,16 @@ contract DelayedActionPlatform {
     mapping(uint256 => Action) public actions;
 
     event ActionCreated(uint256 indexed actionId, address indexed creator, uint256 executeAfter, string data);
-    event ActionExecuted(uint256 indexed actionId, address indexed executor);
+    event ActionExecuted(uint256 indexed actionId, address executor);
 
-    /// @notice Creates a new delayed action
-    /// @param _executeAfter Seconds to wait until the action can be executed
-    /// @param _data Arbitrary data associated with the action
+    error ExecuteAfterMustBePositive();
+    error ActionDoesNotExist(uint256 actionId);
+    error ActionCannotBeExecutedYet(uint256 actionId);
+    error ActionAlreadyExecuted(uint256 actionId);
+    error OnlyCreatorCanExecute(uint256 actionId);
+
     function createAction(uint256 _executeAfter, string memory _data) public {
-        require(_executeAfter > 0, "Execution delay must be > 0");
+        if (_executeAfter == 0) revert ExecuteAfterMustBePositive();
 
         uint256 actionId = nextActionId++;
         uint256 executeAfter = block.timestamp + _executeAfter;
@@ -36,26 +39,21 @@ contract DelayedActionPlatform {
         emit ActionCreated(actionId, msg.sender, executeAfter, _data);
     }
 
-    /// @notice Executes a specified action, if conditions are met
-    /// @param _actionId ID of the action to be executed
     function executeAction(uint256 _actionId) public {
-        require(_actionId < nextActionId, "Action does not exist");
+        if (_actionId >= nextActionId) revert ActionDoesNotExist(_actionId);
         Action storage action = actions[_actionId];
 
-        require(block.timestamp >= action.executeAfter, "Action cannot be executed yet");
-        require(!action.executed, "Action already executed");
-        require(action.creator == msg.sender, "Only creator can execute");
+        if (block.timestamp < action.executeAfter) revert ActionCannotBeExecutedYet(_actionId);
+        if (action.executed) revert ActionAlreadyExecuted(_actionId);
+        if (action.creator != msg.sender) revert OnlyCreatorCanExecute(_actionId);
 
         action.executed = true;
 
         emit ActionExecuted(_actionId, msg.sender);
     }
 
-    /// @notice Fetches details of an action
-    /// @param _actionId ID of the action to fetch
-    /// @return The action details
     function getAction(uint256 _actionId) public view returns (Action memory) {
-        require(_actionId < nextActionId, "Action does not work");
+        if (_actionId >= nextActionId) revert ActionDoesNotExist(_actionId);
         return actions[_actionId];
     }
 }

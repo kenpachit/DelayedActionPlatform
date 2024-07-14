@@ -1,22 +1,32 @@
 from flask import Flask, request, jsonify
+from flask_caching import Cache
 from web3 import Web3
 import os
 from dotenv import load_dotenv
+import json
 
 load_dotenv()
 
 app = Flask(__name__)
 
+# Configure cache
+app.config['CACHE_TYPE'] = 'simple'  # Consider using 'redis' in production for better performance
+cache = Cache(app)
+
 web3 = Web3(Web3.HTTPProvider(os.getenv("BLOCKCHAIN_PROVIDER")))
 
 contract_address = web3.toChecksumAddress(os.getenv("CONTRACT_ADDRESS"))
 with open('path_to_Abi.json') as f:
-    abi = f.read()
+    abi = json.load(f)
 contract = web3.eth.contract(address=contract_address, abi=abi)
 
 @app.route('/api/actions', methods=['POST'])
 def schedule_action():
     data = request.json
+    errors = validate_action_data(data)
+    if errors:
+        return jsonify({'status': 'error', 'message': errors}), 400
+
     account = data.get('account')
     privateKey = data.get('privateKey')
     action = data.get('action')
@@ -31,13 +41,17 @@ def schedule_action():
     })
 
     signed_tx = web3.eth.account.signTransaction(tx, privateKey)
-    tx_hash = web3.eth.sendRawTransaction(signed_tx.rawTransaction)
+    tx_hash = web1.eth.sendRawTransaction(signed_tx.rawTransaction)
 
     return jsonify({'status': 'success', 'data': {'txHash': tx_hash.hex()}}), 200
 
 @app.route('/api/schedules', methods=['GET'])
+@cache.cached(timeout=60, query_string=True)  # Cache the response of this endpoint for 60 seconds
 def get_schedules():
     account = request.args.get('account')
+    
+    if not account:
+        return jsonify({'status': 'error', 'message': 'Account parameter is required'}), 400
     
     schedules = contract.functions.getSchedules(account).call()
 
@@ -47,13 +61,23 @@ def get_schedules():
 def manage_users():
     if request.method == 'POST':
         data = request.json
-        username = data.get('username')
+        username = data.get("username")
         
+        if not username:
+            return jsonify({'status': 'error', 'message': 'Username is required'}), 400
+
+        # Optionally, here you could add logic to actually create the user
+
         return jsonify({'status': 'success', 'data': {'username': username, 'message': 'User created successfully'}}), 201
 
     elif request.method == 'GET':
-        users = [{'username': 'example_user'}]
+        users = [{'username': 'example_user'}]  # Here you might want to fetch real user data
         return jsonify({'status': 'success', 'data': users}), 200
+
+def validate_action_data(data):
+    if 'account' not in data or 'privateKey' not in data or 'action' not in data:
+        return "Account, privateKey, and action fields are required"
+    return None
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

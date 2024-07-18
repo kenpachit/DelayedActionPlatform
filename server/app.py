@@ -13,10 +13,15 @@ app = Flask(__name__)
 app.config['CACHE_TYPE'] = 'simple'  # Consider using 'redis' in production for better performance
 cache = Cache(app)
 
-web3 = Web3(Web3.HTTPProvider(os.getenv("BLOCKCHAIN_PROVIDER")))
+blockchain_provider = os.getenv("BLOCKCHAIN_PROVIDER")
+chain_id = int(os.getenv("CHAIN_ID"))
+contract_address = Web3.toChecksumAddress(os.getenv("CONTRACT_ADDRESS"))
+abi_path = 'path_to_Abi.json'
 
-contract_address = web3.toChecksumAddress(os.getenv("CONTRACT_ADDRESS"))
-with open('path_to_Abi.json') as f:
+web3 = Web3(Web3.HTTPProvider(blockchain_provider))
+
+# Load ABI just once if it doesn't change often
+with open(abi_path) as f:
     abi = json.load(f)
 contract = web3.eth.contract(address=contract_address, abi=abi)
 
@@ -34,19 +39,19 @@ def schedule_action():
     
     nonce = web3.eth.getTransactionCount(account)
     tx = contract.functions.triggerAction(action, *args).buildTransaction({
-        'chainId': int(os.getenv("CHAIN_ID")),
+        'chainId': chain_id,
         'gas': 2000000,
         'gasPrice': web3.toWei('50', 'gwei'),
         'nonce': nonce,
     })
 
     signed_tx = web3.eth.account.signTransaction(tx, privateKey)
-    tx_hash = web1.eth.sendRawTransaction(signed_tx.rawTransaction)
+    tx_hash = web3.eth.sendRawTransaction(signed_tx.rawTransaction)
 
     return jsonify({'status': 'success', 'data': {'txHash': tx_hash.hex()}}), 200
 
 @app.route('/api/schedules', methods=['GET'])
-@cache.cached(timeout=60, query_string=True)  # Cache the response of this endpoint for 60 seconds
+@cache.cached(timeout=60, query_string=True)
 def get_schedules():
     account = request.args.get('account')
     
@@ -66,12 +71,10 @@ def manage_users():
         if not username:
             return jsonify({'status': 'error', 'message': 'Username is required'}), 400
 
-        # Optionally, here you could add logic to actually create the user
-
         return jsonify({'status': 'success', 'data': {'username': username, 'message': 'User created successfully'}}), 201
 
     elif request.method == 'GET':
-        users = [{'username': 'example_user'}]  # Here you might want to fetch real user data
+        users = [{'username': 'example_user'}]
         return jsonify({'status': 'success', 'data': users}), 200
 
 def validate_action_data(data):

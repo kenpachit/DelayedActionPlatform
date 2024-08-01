@@ -14,6 +14,7 @@ Session = sessionmaker(bind=engine)
 
 class User(Base):
     __tablename__ = 'users'
+    
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True, nullable=False)
     email = Column(String, unique=True, nullable=False)
@@ -21,10 +22,11 @@ class User(Base):
     actions = relationship("Action", back_populates="user")
 
     def __repr__(self):
-        return f"<User(username='{self.username}', email='{self.email}')>"
+        return f"<User(id='{self.id}', username='{self.username}', email='{self.email}')>"
 
 class Action(Base):
     __tablename__ = 'actions'
+    
     id = Column(Integer, primary_key=True)
     action_name = Column(String, nullable=False)
     action_details = Column(String, nullable=False)
@@ -33,17 +35,18 @@ class Action(Base):
     schedule = relationship("Schedule", back_populates="action", uselist=False)
 
     def __repr__(self):
-        return f"<Action(action_name='{self.action_name}', action_details='{self.action_details}')>"
+        return f"<Action(id='{self.id}', action_name='{self.action_name}', action_details='{self.action_details}')>"
 
 class Schedule(Base):
     __tablename__ = 'schedules'
+    
     id = Column(Integer, primary_key=True)
     scheduled_time = Column(DateTime, nullable=False)
     action_id = Column(Integer, ForeignKey('actions.id'))
     action = relationship("Action", back_populates="schedule")
 
     def __repr__(self):
-        return f"<Schedule(scheduled_time='{self.scheduled_time}')>"
+        return f"<Schedule(id='{self.id}', scheduled_time='{self.scheduled_time}')>"
 
 def create_tables():
     Base.metadata.create_all(engine)

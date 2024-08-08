@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DelayedActionPlatform Interface</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>DelayedActionPlatform Interface</h1>
+    </header>
+    <section id="create-action">
+        <h2>Create Delayed Action</h2>
+        <form id="create-action-form">
+            <div>
+                <label for="action-name">Action Name:</label>
+                <input type="text" id="action-name" name="action_name" required>
+            </div>
+            <div>
+                <label for="action-time">Action Time:</label>
+                <input type="datetime-local" id="action-time" name="action_time" required>
+            </div>
+            <div>
+                <label for="action-description">Description:</label>
+                <textarea id="action-description" name="action_description" rows="4" cols="50" required></textarea>
+            </div>
+            <button type="submit">Schedule Action</button>
+        </form>
+    </section>
+    <section id="view-actions">
+        <h2>View Scheduled Actions</h2>
+        <div id="scheduled-actions-list">
+        </div>
+    </section>
+    <section id="user-settings">
+        <h2>User Settings</h2>
+        <form id="user-settings-form">
+            <div>
+                <label for="user-timezone">Time Zone:</label>
+                <select id="user-timezone" name="user_timezone" required>
+                </select>
+            </div>
+            <div>
+                <label for="user-preference">Notification Preference:</label>
+                <input type="checkbox" id="user-preference" name="user_preference"> Receive email notifications
+            </div>
+            <button type="submit">Save Settings</button>
+        </form>
+    </section>
+    <script src="env_variables.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
